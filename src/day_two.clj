@@ -1,0 +1,62 @@
+(ns day-two 
+  (:require
+   [clojure.string :as str]
+   [extension]))
+
+; convert to edn
+(->> "data/day_two.txt"
+     slurp
+     str/split-lines
+     (map #(str/split % #" "))
+     (map #(map read-string %))
+     pr-str
+     (spit "data/day_two.edn"))
+
+; solve p1
+(defn safe?
+  [coll]
+  (let [check-all-diffs #(extension/all?
+                          %
+                          (->> coll
+                               rest
+                               (extension/zip coll)
+                               (map (fn [e] (- (second e) (first e))))))]
+    (and (or (check-all-diffs pos?) (check-all-diffs neg?))
+         (check-all-diffs #(>= 3 (abs %))))))
+
+
+(safe? '(7 6 4 2 1)) ; => true
+(safe? '(1 2 7 8 9)) ; => false
+(safe? '(1 3 2 4 5)) ; => false
+
+(->> "data/day_two.edn"
+    slurp
+    read-string
+    (reduce #(+ %1 (if (safe? %2) 1 0)) 0))
+
+; solve p2
+(defn safe-with-damper?
+  [coll]
+  (->> coll
+       (extension/scan (fn [a _] (inc a)) -1)
+       ; get the list with the current index dropped
+       (reduce (fn [acc e]
+                 (cons (concat (take e coll) (drop (+ 1 e) coll)) acc))
+               '())
+       (extension/any? safe?)))
+
+(extension/scan (fn[a _](inc a)) -1 '(1 2 3 4))
+
+(safe-with-damper? '(7 6 4 2 1)) ; => true
+(safe-with-damper? '(1 2 7 8 9)) ; => false
+(safe-with-damper? '(9 7 6 2 1)) ; => false
+(safe-with-damper? '(1 3 2 4 5)) ; => true
+(safe-with-damper? '(8 5 1 2 1)) ; => true
+
+
+
+(->> "data/day_two.edn"
+     slurp
+     read-string
+     (reduce #(+ %1 (if (safe-with-damper? %2) 1 0)) 0))
+  

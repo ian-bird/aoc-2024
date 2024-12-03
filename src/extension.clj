@@ -29,21 +29,14 @@
        (map f)
        (reduce #(or %1 %2) false)))
 
+(defn all? [f coll] (not (any? (complement f) coll)))
+
 (defn contains?
   "this version of contains works properly with all collection types"
   [v coll]
   (extension/any? (partial = v) coll))
 
 (defn all? [f coll] (not (extension/any? (complement f) coll)))
-
-; convert 
-; (specdef inc [x ::int] ::int (+ x 1))
-;
-; to
-;
-; (defn inc "" [x] (if (s/valid? x ::int) (let [result ((fn[x](+ x 1)) x)] (if (s/valid? result ::int) result :return-value-failed-spec)) :argument-failed-spec))
-;
-;
 
 (defn blocks
   "returns a list of lists with length equal to s.
@@ -70,3 +63,7 @@
           (let [~'result ~body]
             (if (s/valid? ~return-spec ~'result) ~'result 'invalid-result))
           'invalid-argument)))))
+
+(defn flip [f] #(f %2 %1))
+
+(defn on [both individual] #(both (individual %1) (individual %2)))

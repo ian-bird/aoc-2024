@@ -2,6 +2,16 @@
   (:require
    [extension]))
 
+
+; convert to edn
+(->> "data/day_one.txt"
+     slurp
+     str/split-lines
+     (map #(str/split % #" "))
+     (map #(map read-string %))
+     pr-str
+     (spit "data/day_one.edn"))
+
 ; solution for p1
 (let [input (read-string (slurp "data/day_one.edn"))]
   (reduce +
