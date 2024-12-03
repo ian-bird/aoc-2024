@@ -46,8 +46,6 @@
        (map #(concat (take % coll) (drop (inc %) coll)))
        (extension/any? safe?)))
 
-(extension/scan (fn[a _](inc a)) -1 '(1 2 3 4))
-
 (safe-with-damper? '(7 6 4 2 1)) ; => true
 (safe-with-damper? '(1 2 7 8 9)) ; => false
 (safe-with-damper? '(9 7 6 2 1)) ; => false
