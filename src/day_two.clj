@@ -32,7 +32,10 @@
 (->> "data/day_two.edn"
     slurp
     read-string
-    (reduce #(+ %1 (if (safe? %2) 1 0)) 0))
+    (filter safe?)
+     count)
+
+
 
 ; solve p2
 (defn safe-with-damper?
@@ -40,9 +43,7 @@
   (->> coll
        (extension/scan (fn [a _] (inc a)) -1)
        ; get the list with the current index dropped
-       (reduce (fn [acc e]
-                 (cons (concat (take e coll) (drop (+ 1 e) coll)) acc))
-               '())
+       (map #(concat (take % coll) (drop (inc %) coll)))
        (extension/any? safe?)))
 
 (extension/scan (fn[a _](inc a)) -1 '(1 2 3 4))
@@ -58,5 +59,6 @@
 (->> "data/day_two.edn"
      slurp
      read-string
-     (reduce #(+ %1 (if (safe-with-damper? %2) 1 0)) 0))
+     (filter safe-with-damper?)
+     count)
   
