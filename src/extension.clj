@@ -67,3 +67,10 @@
 (defn flip [f] #(f %2 %1))
 
 (defn on [both individual] #(both (individual %1) (individual %2)))
+
+(defn chunk
+  "Returns a list of chunks in which the return value of calling f on each element is the same."
+  [f coll]
+  (vals (reduce (fn [map e] (update map (f e) #(cons e %)))
+                (reduce (fn [map e] (assoc map (f e) '())) {} coll)
+                coll)))

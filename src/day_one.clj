@@ -24,13 +24,14 @@
      (reduce + 0))
 
 ; solution for p2
-(let [input (read-string (slurp "data/day_one.edn"))
-      ; create a map of all the nums in the right column with 0 in each
-      ; slot
-      zeroed-map (reduce (fn [map e] (assoc map (second e) 0)) {} input)
+(let [input (->> "data/day_one.edn"
+                slurp
+                read-string)
       ; update the map to have all the numbers in it
-      right-counts
-      (reduce (fn [map e] (update map (second e) inc)) zeroed-map input)]
+      right-counts (->> input
+                        (extension/chunk #(second %))
+                        (map #(vector (second (first %)) (count %)))
+                        (into {}))]
   (->> input
        (filter #(contains? right-counts (first %)))
        (map #(* (first %) (get right-counts (first %))))
