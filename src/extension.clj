@@ -2,8 +2,6 @@
   (:require
    [clojure.spec.alpha :as s]))
 
-
-
 (defn scan
   [f v coll] 
   (->> coll
@@ -14,14 +12,7 @@
 
 (defmacro zip [& lists] `(map list ~@lists))
 
-
-
-(zip '(1 2 3 4) (cycle [true false]))
-
 (defn append [l1 & lrest] (apply concat (cons l1 lrest)))
-
-(->> '(1 2 3 4 5 6) (zip (cycle [true false])) (filter first) (map second))
-
 
 (defn any?
   [f coll]
