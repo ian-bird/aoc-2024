@@ -65,3 +65,20 @@
   (vals (reduce (fn [map e] (update map (f e) #(cons e %)))
                 (reduce (fn [map e] (assoc map (f e) '())) {} coll)
                 coll)))
+
+(defn rotate
+  "shifts n elements from the end of the array to the front"
+  [n coll]
+  (if (> n 0)
+    (rotate (dec n) (concat (list (last coll)) (drop-last coll)))
+    (if (< n 0)
+      (rotate (inc n) (concat (rest coll) (list (first coll))))
+      coll)))
+
+(defn combinations
+  "returns a list of lists of the possible combinations from 2 lists
+   (may expand this to work with n lists)"
+  [coll1 coll2]
+  (->> coll1
+       (map (fn[e1](map #(list e1 %) coll2)))
+       (apply concat)))
