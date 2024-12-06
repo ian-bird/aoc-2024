@@ -82,3 +82,10 @@
   (->> coll1
        (map (fn[e1](map #(list e1 %) coll2)))
        (apply concat)))
+
+(defn index-of-pred
+  "returns the first index of a value that satisfies the predicate"
+  [pred coll]
+  (ffirst (filter (comp pred second) (map-indexed list coll))))
+
+

@@ -4,13 +4,13 @@
    [extension]))
 
 ; convert to edn
-(->> "data/day_two.txt"
+(->> "data/day_two/problem.txt"
      slurp
      str/split-lines
      (map #(str/split % #" "))
      (map #(map read-string %))
      pr-str
-     (spit "data/day_two.edn"))
+     (spit "data/day_two/problem.edn"))
 
 ; solve p1
 (defn safe?
@@ -29,7 +29,7 @@
 (safe? '(1 2 7 8 9)) ; => false
 (safe? '(1 3 2 4 5)) ; => false
 
-(->> "data/day_two.edn"
+(->> "data/day_two/problem.edn"
     slurp
     read-string
     (filter safe?)
@@ -54,7 +54,7 @@
 
 
 
-(->> "data/day_two.edn"
+(->> "data/day_two/problem.edn"
      slurp
      read-string
      (filter safe-with-damper?)

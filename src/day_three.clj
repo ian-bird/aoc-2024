@@ -4,17 +4,17 @@
    [extension]))
 
 
-(->> "data/day_three.txt"
+(->> "data/day_three/problem.txt"
      slurp
      (re-seq #"mul\((?:\d){1,3},(?:\d){1,3}\)")
      (map #(re-seq #"\d+" %))
      (map #(map read-string %))
      (map #(hash-map 'mul %))
      pr-str
-     (spit "data/day_three.edn"))
+     (spit "data/day_three/p1.edn"))
 
 ; solve part 1
-(->> "data/day_three.edn"
+(->> "data/day_three/p1.edn"
      slurp
      read-string
      (map #(reduce * 1 (get % 'mul)))
@@ -22,7 +22,7 @@
 
 ; create new edn for part 2
 
-(->> "data/day_three.txt"
+(->> "data/day_three/problem.txt"
      slurp
      (re-seq #"(?:mul\((?:\d){1,3},(?:\d){1,3}\))|(?:do\(\))|(?:don't\(\))")
      (map #(if (str/starts-with? % "mul")
@@ -31,11 +31,11 @@
      (map #(if (coll? %) (map read-string %) (read-string %)))
      (map #(if (coll? %) (hash-map 'mul %) %))
      pr-str
-     (spit "data/day_three_p2.edn"))
+     (spit "data/day_three/p2.edn"))
 
 ; solve part 2
 
-(let [input (->> "data/day_three_p2.edn"
+(let [input (->> "data/day_three/p2.edn"
                  slurp
                  read-string)]
   (->> input

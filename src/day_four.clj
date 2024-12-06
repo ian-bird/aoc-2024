@@ -7,15 +7,15 @@
 ; the strings, the transpose of the strings, and the reverse of each.
 
 ; convert to 2D array of chars
-(->> "data/day_four_test.txt"
+(->> "data/day_four/test.txt"
      slurp
      str/split-lines
      (map #(str/split % #""))
      pr-str
-     (spit "data/day_four_test.edn"))
+     (spit "data/day_four/test.edn"))
 
 ; p1
-(let [list-list (->> "data/day_four.edn"
+(let [list-list (->> "data/day_four/problem.edn"
                      slurp
                      read-string
                      (map #(concat % (list "|")))) ; putting this in to stop diagonal matches wrapping
@@ -53,7 +53,7 @@
 ; squares that we need to analyze first, then going through them
 ; and seeing if they match.
 (let [; this is our 2D array of chars
-      list-list (->> "data/day_four.edn"
+      list-list (->> "data/day_four/problem.edn"
                      slurp
                      read-string
                      (map #(concat % (list "|"))))

@@ -5,16 +5,16 @@
 
 
 ; convert to edn
-(->> "data/day_one.txt"
+(->> "data/day_one/problem.txt"
      slurp
      str/split-lines
      (map #(str/split % #" "))
      (map #(map read-string %))
      pr-str
-     (spit "data/day_one.edn"))
+     (spit "data/day_one/problem.edn"))
 
 ; solution for p1
-(->> "data/day_one.edn"
+(->> "data/day_one/problem.edn"
      slurp
      read-string
      (apply mapv vector)
@@ -24,7 +24,7 @@
      (reduce + 0))
 
 ; solution for p2
-(let [input (->> "data/day_one.edn"
+(let [input (->> "data/day_one/problem.edn"
                 slurp
                 read-string)
       ; update the map to have all the numbers in it
