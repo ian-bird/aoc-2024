@@ -10,7 +10,7 @@
        rest
        (map (fn [e] (reduce f v e)))))
 
-(defmacro zip [& lists] `(map list ~@lists))
+(defn zip [& lists] (apply (partial map list) lists))
 
 (defn append [l1 & lrest] (apply concat (cons l1 lrest)))
 
@@ -86,6 +86,50 @@
 (defn index-of-pred
   "returns the first index of a value that satisfies the predicate"
   [pred coll]
-  (ffirst (filter (comp pred second) (map-indexed list coll))))
+  (->> coll
+       (map-indexed list)
+       (filter (comp pred second))
+       ffirst))
 
+(index-of-pred (partial = 3) '(1 2 4))
 
+(defn nD-index-of-pred
+  "returns a list corresponding to the path to a value that satisfies the predicate"
+  [pred coll]
+  (->> coll
+       (map-indexed list)
+       (filter #(if (coll? (second %))
+                  (not (nil? (first (nD-index-of-pred pred (second %)))))
+                  (pred (second %))))
+       first
+       (#(if (coll? (second %))
+           (cons (first %) (nD-index-of-pred pred (second %)))
+           (list (first %))))))
+
+(defn nD-nth
+  "recursive nth for multi-dimensional arrays"
+  [path coll]
+  (if (= '() path) coll (nD-nth (rest path) (nth coll (first path)))))
+
+(defn update
+  "passes old value at n to f, returns the list with only that value changed"
+  [n f coll]
+  (if (= n 0)
+    (cons (f (first coll)) (rest coll))
+    (cons (first coll) (update (dec n) f (rest coll)))))
+
+(defn nD-update
+  "path is an Nth dimensional index, replace the value at that position passing it through f"
+  [path f coll]
+  (if (-> path count (= 1))
+    (update (first path) f coll)
+    (update (first path) #(nD-update (rest path) f %) coll)))
+
+(defn nD-inBounds
+  "returns whether or not the position corresponds to an existant value"
+  [path coll]
+  (if (= path '())
+    true
+    (if (or (> 0 (first path)) (<= (count coll) (first path)))
+      false
+      (nD-inBounds (rest path) (nth coll (first path))))))

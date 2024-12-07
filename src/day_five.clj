@@ -17,8 +17,6 @@
                            (map #(map read-string %)))))
 
 ; p1
-
-
 (defn matched-rules
   [an-update rules]
   (filter #(and (e/contains? (first %) an-update)
@@ -79,8 +77,8 @@
       failed-updates (filter #(not (ok? rules %)) updates)]
   (->> failed-updates
        (map (partial failed-rules rules))
-       ( map first)
-       (e/zip failed-updates) 
+       (map first)
+       (e/zip failed-updates)
        (map #(fix rules (first %) (second %)))
        (map center-val)
        (reduce + 0)))
