@@ -46,9 +46,8 @@
 
 ; p2
 (defn loop?
-  [pos dir tiles insert-position]
-  (let [fast-lookup (memoize #(e/nD-nth % tiles))
-        rotate-right-sym {"^" ">" ">" "V" "V" "<" "<" "^"}
+  [pos dir insert-position lookup-fn]
+  (let [rotate-right-sym {"^" ">" ">" "V" "V" "<" "<" "^"}
         dirs-to-steps {"^" [-1 0] "V" [1 0] "<" [0 -1] ">" [0 1]}]
     (loop [steps (list pos)
            dir dir
@@ -57,7 +56,7 @@
                            (get dirs-to-steps)
                            (e/zip (first steps))
                            (map #(apply + %)))
-            tile-value (fast-lookup next-spot)
+            tile-value (lookup-fn next-spot)
             set-key (list (first steps) dir)]
         (if (contains? visited set-key)
           true
@@ -74,7 +73,7 @@
     (->> tiles
          (find-path pos dir)
          distinct
-         (pmap #(loop? pos dir tiles %))
+         (pmap #(loop? pos dir % (memoize (fn [x] (e/nD-nth x tiles)))))
          (filter identity)
          count)))
 
