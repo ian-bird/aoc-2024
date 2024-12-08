@@ -11,3 +11,12 @@
        callback
        pr-str
        (spit (str/join (list file-name ".edn")))))
+
+(defn extract-nums-only
+  "creates a 2d array of all the numbers and pipes to edn"
+  [fpath]
+  (txt->edn fpath
+               (fn [lines]
+                 (->> lines
+                      (map (partial re-seq #"\d+"))
+                      (mapv #(mapv read-string %))))))

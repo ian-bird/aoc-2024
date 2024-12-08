@@ -83,6 +83,10 @@
        (map (fn[e1](map #(list e1 %) coll2)))
        (apply concat)))
 
+(defn n-combinations
+  [& colls]
+  ( reduce (fn [acc e] (map flatten (combinations acc e)))  colls))
+
 (defn index-of-pred
   "returns the first index of a value that satisfies the predicate"
   [pred coll]
@@ -133,3 +137,26 @@
     (if (or (> 0 (first path)) (<= (count coll) (first path)))
       false
       (nD-inBounds (rest path) (nth coll (first path))))))
+
+
+(defn pfilter
+  "parallelized version of filter"
+  [f coll]
+  (->> coll
+       (pmap f)
+       (zip coll)
+       (filter second)
+       (map first)))
+
+(defn <*>
+  "applicative operator"
+  [outer left right]
+  (fn[l r](outer (left l) (right r))))
+
+(defn on
+  [outer both]
+  (<*> outer both both))
+
+(defn !=
+  [x1 x2 & xs]
+  (not (apply = (cons x1 (cons x2 xs)))))
