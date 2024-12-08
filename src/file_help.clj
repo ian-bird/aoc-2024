@@ -20,3 +20,11 @@
                  (->> lines
                       (map (partial re-seq #"\d+"))
                       (mapv #(mapv read-string %))))))
+
+(defn extract-chars
+  "create a 2d array of all the characters and pipe to edn"
+  [fpath]
+  (txt->edn fpath
+            (fn [lines]
+              (->> lines
+                   (mapv (fn[line](str/split line #"")))))))

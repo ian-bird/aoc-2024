@@ -18,15 +18,19 @@
 (let [list-list (->> "data/day_four/problem.edn"
                      slurp
                      read-string
-                     (map #(concat % (list "|")))) ; putting this in to stop diagonal matches wrapping
+                     (map #(concat % (list "|")))) ; putting this in to stop
+                                                   ; diagonal matches
+                                                   ; wrapping
       horizontal (map str/join list-list)
-      transpose (fn [x] ; finds transpose, allowing all matches to be done on a single axis
+      transpose (fn [x] ; finds transpose, allowing all matches to be done
+                        ; on a single axis
                   (->> x
                        (map (partial into '()))
                        (apply mapv vector)
                        (map str/join)))
       vertical (transpose list-list)
-      diagonalify (fn [x] ; rotates all the arrays appropriately then transposes
+      diagonalify (fn [x] ; rotates all the arrays appropriately then
+                          ; transposes
                     (->> x
                          (extension/zip list-list)
                          (map #(apply (extension/flip extension/rotate) %))
@@ -37,7 +41,8 @@
       trbl-diagonal (->> list-list
                          (extension/scan (fn [a _] (dec a)) 1)
                          diagonalify)
-      match (fn [re str-list] ; finds if the regex is in the string and returns the count
+      match (fn [re str-list] ; finds if the regex is in the string and
+                              ; returns the count
               (->> str-list
                    (map #(re-seq re %))
                    (map count)
@@ -94,7 +99,7 @@
   ; get the 2D array of 3x3 squares,
   ; turn it into a 1D array of 3x3 squares,
   ; filter out only the ones that are xmas,
-  ; count them up
+  ; count them upm
   (->> char-squares-on-grid
        (apply concat)
        (filter is-xmas?)

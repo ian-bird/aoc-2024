@@ -160,3 +160,9 @@
 (defn !=
   [x1 x2 & xs]
   (not (apply = (cons x1 (cons x2 xs)))))
+
+(defn outer*
+  "performs the outer product, returning a 2d array
+   and applying the function at each index" 
+  [f coll1 coll2]
+  (map (fn [c1] (map (fn [c2] (f c1 c2)) coll2)) coll1))
