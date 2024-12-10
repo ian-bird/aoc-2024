@@ -33,9 +33,14 @@
   "returns a list of lists with length equal to s.
               Example: (blocks 2 '(1 2 3 4 5 6)) => ((1 2) (3 4) (5 6))"
   [s coll]
-  (if (>= s (count coll))
-    (list coll)
-    (cons (take s coll) (blocks s (drop s coll)))))
+  (loop [s s
+         coll coll
+         result []]
+    (if (>= s (count coll))
+      (conj result coll)
+      (recur s (drop s coll) (conj result (take s coll))))))
+
+(conj [] '(1 2))
 
 (defmacro specdef
   "creates a new definition with spec checks on arguments and the return
@@ -118,9 +123,10 @@
 (defn update
   "passes old value at n to f, returns the list with only that value changed"
   [n f coll]
+  (loop [n n f f coll coll res '()]
   (if (= n 0)
-    (cons (f (first coll)) (rest coll))
-    (cons (first coll) (update (dec n) f (rest coll)))))
+    (concat (reverse (cons (f (first coll)) res)) (rest coll))
+    (recur (dec n) f (rest coll) (cons  (first coll) res)))))
 
 (defn nD-update
   "path is an Nth dimensional index, replace the value at that position passing it through f"
