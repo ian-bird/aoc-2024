@@ -184,8 +184,8 @@
 
 (defmacro mrfn
   "This macro behaves similar to fn, except it memoizes its results.
-   Recusion can be done via mrecur in much the same way as recur,
-   though this *DOES NOT* implement tail recursion.
+   Recusion can be done via recur, though this *DOES NOT* implement 
+   tail recursion, nor need to be called in the tail position.
    
    This is a way to create recursive memoized functions, useful
    for things such as the fibonacci sequence, to avoid exponential
@@ -196,6 +196,6 @@
        (let [~fn# (fn [mem-fn# ~@args]
                     (let [~fn# (fn [& mem-args#]
                                  (apply mem-fn# mem-fn# mem-args#))]
-                      ~(deep-replace body 'mrecur fn#)))
+                      ~(deep-replace body 'recur fn#)))
              mem-fn# (memoize ~fn#)]
          (mem-fn# mem-fn# ~@args)))))

@@ -35,17 +35,17 @@
             1
             (let [digits (map read-string (str/split (pr-str stone) #""))
                   num-digits (count digits)]
-              (cond (zero? stone) (mrecur (dec blinks) 1)
+              (cond (zero? stone) (recur (dec blinks) 1)
                     (even? num-digits)
-                    (+ (mrecur (dec blinks)
+                    (+ (recur (dec blinks)
                                (reduce #(+ (* 10 %1) %2)
                                        0
                                        (take (/ num-digits 2) digits)))
-                       (mrecur (dec blinks)
+                       (recur (dec blinks)
                                (reduce #(+ (* 10 %1) %2)
                                        0
                                        (drop (/ num-digits 2) digits))))
-                    :else (mrecur (dec blinks) (* 2024 stone)))))))
+                    :else (recur (dec blinks) (* 2024 stone)))))))
 
 (->> "data/day_eleven/problem.edn"
      slurp
