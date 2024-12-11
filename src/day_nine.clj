@@ -1,5 +1,5 @@
 (ns day-nine 
-  (:require
+  (:require 
    [file-help :as fh]))
 
 (fh/extract-chars "data/day_nine/test")
@@ -34,5 +34,3 @@
   (reduce +))
 
 ; gold was done in ruby, ran out of time to re-implement in clojure.
-(let [ nums (reverse (range (inc (first (last start)))))
-      sizes (map count (filter #(not (= 'empty (first %))) start))])
