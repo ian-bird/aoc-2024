@@ -9,16 +9,15 @@
 (defn update-stones
   [stones]
   (mapcat (memoize (fn [stone]
-            (let [digits (map read-string (str/split (pr-str stone) #""))
-                  num-digits (count digits)]
-              (cond (zero? stone) (list 1)
-                    (even? num-digits) (list (reduce #(+ (* 10 %1) %2)
-                                                     0
-                                                     (take (/ num-digits 2) digits))
-                                             (reduce #(+ (* 10 %1) %2)
-                                                     0
-                                                     (drop (/ num-digits 2) digits)))
-                    :else (list (* 2024 stone))))))
+                     (let [digits (map read-string
+                                       (str/split (pr-str stone) #""))
+                           num-digits (count digits)]
+                       (cond (zero? stone) (list 1)
+                             (even? num-digits)
+                             (map (reduce #(+ (* 10 %1) %2)
+                                          0
+                                          (split-at (/ num-digits 2) digits)))
+                             :else (list (* 2024 stone))))))
           stones))
 
 (time (count (reduce (fn [acc _] (update-stones acc))
@@ -38,13 +37,13 @@
               (cond (zero? stone) (recur (dec blinks) 1)
                     (even? num-digits)
                     (+ (recur (dec blinks)
-                               (reduce #(+ (* 10 %1) %2)
-                                       0
-                                       (take (/ num-digits 2) digits)))
+                              (reduce #(+ (* 10 %1) %2)
+                                      0
+                                      (take (/ num-digits 2) digits)))
                        (recur (dec blinks)
-                               (reduce #(+ (* 10 %1) %2)
-                                       0
-                                       (drop (/ num-digits 2) digits))))
+                              (reduce #(+ (* 10 %1) %2)
+                                      0
+                                      (drop (/ num-digits 2) digits))))
                     :else (recur (dec blinks) (* 2024 stone)))))))
 
 (->> "data/day_eleven/problem.edn"

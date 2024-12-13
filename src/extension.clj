@@ -157,6 +157,10 @@
   [outer left right]
   (fn[l r](outer (left l) (right r))))
 
+(defn dup
+  [f]
+  (fn[x](f x x)))
+
 (defn on
   [outer both]
   (<*> outer both both))
@@ -199,3 +203,10 @@
                       ~(deep-replace body 'recur fn#)))
              mem-fn# (memoize ~fn#)]
          (mem-fn# mem-fn# ~@args)))))
+
+(defn zip-with-rest [coll]
+  "zip a collection with (rest collection).
+   this creates a collection of tuples of items
+   that were adjacent in the original collection.
+   This is useful for measuring increases across a collection."
+  (zip (rest coll) coll))
