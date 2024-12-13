@@ -22,7 +22,9 @@
   [plots]
   (reduce (fn [gardens plot]
             (let [adjacent-gardens (filter (fn [garden]
-                                             (e/any? #(and  ( adjacent? plot %) (= (get % 'val) (get plot 'val)))
+                                             (e/any? #(and (adjacent? plot %)
+                                                           (= (get % 'val)
+                                                              (get plot 'val)))
                                                      garden))
                                            gardens)
                   other-gardens (filter #(not (e/contains? % adjacent-gardens))
