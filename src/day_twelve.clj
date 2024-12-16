@@ -35,7 +35,8 @@
 
 (defn num-adjacent [plot plots] (count (filter (partial adjacent? plot) plots)))
 
-; concept - split into groups, get the number of adjacent elements for each plot in the garden
+; concept - split into groups, get the number of adjacent elements for each plot 
+; in the garden
 ; subtract the number of adjacents from 4, yielding the count of adjacent empty slots
 ; then get cost by summing that up and multiplying it by the total count of plots
 (->> "data/day_twelve/problem.edn"

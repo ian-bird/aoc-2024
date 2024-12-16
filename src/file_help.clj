@@ -18,7 +18,7 @@
   (txt->edn fpath
                (fn [lines]
                  (->> lines
-                      (map (partial re-seq #"\d+"))
+                      (map (partial re-seq #"-?\d+"))
                       (mapv #(mapv read-string %))))))
 
 (defn extract-chars

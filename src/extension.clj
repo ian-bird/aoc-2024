@@ -1,6 +1,7 @@
 (ns extension 
   (:require
-   [clojure.spec.alpha :as s]))
+   [clojure.spec.alpha :as s]
+   [clojure.string :as str]))
 
 (defn scan
   [f v coll] 
@@ -24,8 +25,14 @@
 
 (defn contains?
   "this version of contains works properly with all collection types"
-  [v coll]
-  (extension/any? (partial = v) coll))
+  [v coll] 
+  (if (extension/any? #(= (class v) (class %)) coll)
+    (extension/any? (partial = v) coll)
+    (do
+      (printf "[WARNING] possible type error, none match for %s contains? %s" coll v)
+      (extension/any? (partial = v) coll))))
+
+( contains? "d" '("a" "b" "c"))
 
 (defn all? [f coll] (not (extension/any? (complement f) coll)))
 
@@ -210,3 +217,6 @@
    that were adjacent in the original collection.
    This is useful for measuring increases across a collection."
   (zip (rest coll) coll))
+
+(defn strcat [s1 & ss]
+  ( str/join (cons s1 ss)))

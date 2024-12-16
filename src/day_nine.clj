@@ -5,6 +5,7 @@
 (fh/extract-chars "data/day_nine/test")
 (fh/extract-chars "data/day_nine/problem")
 
+
 ; silver
 (def start
   (->> "data/day_nine/test.edn"
