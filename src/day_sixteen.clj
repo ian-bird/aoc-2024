@@ -4,42 +4,34 @@
    [extension :as e]
    [file-help :as fh]))
 
-(defn min-ignoring-nils
-  [vals]
-  (if (empty? (filter (complement nil?) vals))
-    nil
-    (apply min (filter (complement nil?) vals))))
-
-(defn +without-nils
-  [& args]
-  (if (e/any? nil? args) nil
-      (apply + args)))
-
 (defn get-forward
-  [from dir from-cost]
-  {(mapv + from dir) {:dir dir :cost (+ 1 from-cost)}})
+  [from dir from-cost path]
+  {(mapv + from dir) {:dir dir :cost (+ 1 from-cost) :path (conj path from)}})
 
 (defn get-left
-  [from dir from-cost]
+  [from dir from-cost path]
   (let [left (case dir
                [0 1] [1 0]
                [1 0] [0 -1]
                [0 -1] [-1 0]
                [-1 0] [0 1])]
-    {(mapv + from left) {:dir left :cost (+ 1001 from-cost)}}))
+    {(mapv + from left)
+     {:dir left :cost (+ 1001 from-cost) :path (conj path from)}}))
 
 (defn get-right
-  [from dir from-cost]
+  [from dir from-cost path]
   (let [right (case dir
                 [0 1] [-1 0]
                 [-1 0] [0 -1]
                 [0 -1] [1 0]
                 [1 0] [0 1])]
-    {(mapv + from right) {:dir right :cost (+ 1001 from-cost)}}))
+    {(mapv + from right)
+     {:dir right :cost (+ 1001 from-cost) :path (conj path from)}}))
 
 (defn get-possible-steps
-  [square dir cost]
-  (mapv #((eval %) square dir cost) '(get-forward get-left get-right)))
+  [square hash]
+  (mapv #(apply (eval %) square (map (partial get hash) [:dir :cost :path]))
+        '(get-forward get-left get-right)))
 
 (defn find-paths
   [maze]
@@ -55,7 +47,7 @@
              (e/index-of-pred
               (partial = "S")
               (nth maze (e/index-of-pred #(e/contains? "S" %) maze)))]
-            {:dir [0 1] :cost 0}}]
+            {:dir [0 1] :cost 0 :path #{}}}]
       (if (contains? visited-squares end)
         (get visited-squares end)
         (->> visited-squares
@@ -65,12 +57,8 @@
              ; each visited square
              (mapcat (fn [visited-square]
                        (get-possible-steps visited-square
-                                           (-> visited-squares
-                                               (get visited-square)
-                                               (get :dir))
-                                           (-> visited-squares
-                                               (get visited-square)
-                                               (get :cost)))))
+                                           (get visited-squares
+                                                visited-square))))
              ; remove the ones that are out of bounds
              (filter (fn [considering]
                        (let [key (first (keys considering))
@@ -84,24 +72,25 @@
              (filter (fn [considering]
                        (->> considering
                             keys
-                            first
+                            first 
                             ((fn [[r c]]
                                (-> maze
                                    (get r)
                                    (get c))))
                             (e/!= "#"))))
              ; remove the ones we've already visited
-             (filter (fn [considering]
+             #break (filter (fn [considering]
                        (->> considering
                             keys
                             first
                             (contains? visited-squares)
                             not)))
              (get-mins #(get (first (vals %)) :cost))
-             (reduce conj visited-squares)
+             (apply merge-with
+                    (fn [l r]
+                      {:dir (get l :dir) :cost (get l :cost) :path (set/union l r)})
+                    visited-squares)
              (recur))))))
-
-
 
 (let [maze-file "data/day_sixteen/test"]
   (fh/extract-chars maze-file)
@@ -109,5 +98,5 @@
        slurp
        read-string
        find-paths
-       (#(list (get % :cost)))
+       (#(list (get % :cost) (count (get % :path))))
        time))
