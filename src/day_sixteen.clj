@@ -4,11 +4,11 @@
    [extension :as e]
    [file-help :as fh]))
 
-(defn get-forward
+(defn step-forward
   [from dir from-cost path]
   {(mapv + from dir) {:dir dir :cost (+ 1 from-cost) :path (conj path from)}})
 
-(defn get-left
+(defn step-left
   [from dir from-cost path]
   (let [left (case dir
                [0 1] [1 0]
@@ -18,7 +18,7 @@
     {(mapv + from left)
      {:dir left :cost (+ 1001 from-cost) :path (conj path from)}}))
 
-(defn get-right
+(defn step-right
   [from dir from-cost path]
   (let [right (case dir
                 [0 1] [-1 0]
@@ -28,10 +28,18 @@
     {(mapv + from right)
      {:dir right :cost (+ 1001 from-cost) :path (conj path from)}}))
 
-(defn get-possible-steps
+(defn steps-forward
   [square hash]
   (mapv #(apply (eval %) square (map (partial get hash) [:dir :cost :path]))
-        '(get-forward get-left get-right)))
+        '(step-forward step-left step-right)))
+
+(defn steps-backwards
+  [square dir]
+  (let [coords (fn [[abs-r abs-c] [rel-r rel-c]] [(+ abs-r rel-r) (+ abs-c rel-c)])
+        back-back (map (partial * -2) dir)
+        back-left (assoc (mapv (partial * -1) dir) 0 1)
+        back-right (assoc (mapv (partial * -1) dir) 0 -1)]
+    (map (partial coords square) [back-back back-left back-right])))
 
 (defn find-paths
   [maze]
@@ -56,9 +64,8 @@
              ; get all the squares that can be walked to from
              ; each visited square
              (mapcat (fn [visited-square]
-                       (get-possible-steps visited-square
-                                           (get visited-squares
-                                                visited-square))))
+                       (steps-forward visited-square
+                                      (get visited-squares visited-square))))
              ; remove the ones that are out of bounds
              (filter (fn [considering]
                        (let [key (first (keys considering))
@@ -72,31 +79,65 @@
              (filter (fn [considering]
                        (->> considering
                             keys
-                            first 
+                            first
                             ((fn [[r c]]
                                (-> maze
                                    (get r)
                                    (get c))))
                             (e/!= "#"))))
              ; remove the ones we've already visited
-             #break (filter (fn [considering]
+             (filter (fn [considering]
                        (->> considering
                             keys
                             first
                             (contains? visited-squares)
                             not)))
+             ; get the cheapest moves; we're only doing these
              (get-mins #(get (first (vals %)) :cost))
-             (apply merge-with
-                    (fn [l r]
-                      {:dir (get l :dir) :cost (get l :cost) :path (set/union l r)})
-                    visited-squares)
+             ; do these have more than one valid path to them? if so union
+             ; their paths add them to the visited list before recurring
+             (map
+              (fn [hash]
+                (let [from (first (keys hash))
+                      metadata (first (vals hash))
+                      this-cost (get metadata :cost)
+                      this-dir (get metadata :dir)
+                      potential-routes-from (steps-backwards from this-dir)
+                      target-cost-diffs [2 1002 1002]
+                      matched (mapv vector
+                                    potential-routes-from
+                                    (mapv (partial - this-cost)
+                                          target-cost-diffs))]
+                  (->> matched
+                       ; only get the ones with valid costs for backtracing
+                       (filter (fn [possible-backstep]
+                                 (= (get (get visited-squares
+                                              (first possible-backstep))
+                                         :cost)
+                                    (second possible-backstep))))
+                       ; grab the path form it
+                       (map (fn [[square _]]
+                              (set/union #{square}
+                                         (get (get visited-squares square)
+                                              :path))))
+                       ; build the new path with the merger of the two previous ones
+                       (cons p)
+                       (apply set/union)
+                       (fn [p])
+                       (update v :path)
+                       (fn [v])
+                       (update-vals hash)))))
+             ; and record metadata
+             (apply merge visited-squares)
              (recur))))))
 
-(let [maze-file "data/day_sixteen/test"]
+(reduce set/union #{[1 1] } #{[1 1]})
+
+(let [maze-file "data/day_sixteen/problem"]
   (fh/extract-chars maze-file)
   (->> (e/strcat maze-file ".edn")
        slurp
        read-string
        find-paths
-       (#(list (get % :cost) (count (get % :path))))
+       (#(list (get % :cost) (inc (count (get % :path)))))
        time))
