@@ -1,8 +1,7 @@
 (ns day-fifteen 
   (:require
    [extension :as e]
-   [file-help :as fh]
-   [clojure.string :as str]))
+   [file-help :as fh]))
 
 (defn convert-to-entities
   [char-map]
