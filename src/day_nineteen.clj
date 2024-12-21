@@ -4,16 +4,15 @@
    [extension :as e]
    [file-help :as fh]))
 
-(def valid-pattern?
+(def count-valid-patterns
   (e/mrfn [towels pattern]
           (if (= pattern "")
-            true
-            (if (->> towels
-                     (filter #(str/starts-with? pattern %))
-                     (map #(subs pattern (count %)))
-                     (some (fn [after-cut] (recur towels after-cut))))
-              true
-              false))))
+            1
+            (->> towels
+                 (filter #(str/starts-with? pattern %))
+                 (map #(subs pattern (count %)))
+                 (map (fn [after-cut] (recur towels after-cut)))
+                 (reduce + 0)))))
 
 (let [fp "data/day_nineteen/problem"]
   (fh/txt->edn fp
@@ -31,7 +30,6 @@
        slurp
        read-string
        ((fn [data] (map (fn [line] [(first data) line]) (rest data)))) 
-       (map #( apply valid-pattern? %))
-       (filter identity)
-       count
+       (pmap #( apply count-valid-patterns %))
+       (reduce + 0)
        time))
