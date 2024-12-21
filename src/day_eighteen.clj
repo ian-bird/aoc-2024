@@ -32,7 +32,7 @@
   (->> (str path ".edn")
        slurp
        read-string
-       (take 1024)
+       (take 3043)
        (into #{})
        ((fn [dropped]
           (mapv (fn [r]
@@ -53,4 +53,4 @@
          slurp
          read-string
          d16/find-paths
-         first)))
+         ( #(get % :cost )))))
