@@ -31,7 +31,7 @@
 (defn steps-forward
   [square hash]
   (mapv #(apply (eval %) square (map (partial get hash) [:dir :cost :path]))
-        '(step-forward step-left step-right)))
+        (list step-forward step-left step-right)))
 
 (defn steps-backwards
   [square dir]
@@ -130,8 +130,6 @@
              ; and record metadata
              (apply merge visited-squares)
              (recur))))))
-
-(reduce set/union #{[1 1] } #{[1 1]})
 
 (let [maze-file "data/day_sixteen/problem"]
   (fh/extract-chars maze-file)
