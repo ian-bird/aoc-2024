@@ -131,7 +131,7 @@
              (apply merge visited-squares)
              (recur))))))
 
-(let [maze-file "data/day_sixteen/problem"]
+(let [maze-file "data/day_sixteen/test"]
   (fh/extract-chars maze-file)
   (->> (e/strcat maze-file ".edn")
        slurp

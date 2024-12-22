@@ -32,7 +32,7 @@
   (->> (str path ".edn")
        slurp
        read-string
-       (take 3043)
+       (take 3042)
        (into #{})
        ((fn [dropped]
           (mapv (fn [r]

@@ -190,6 +190,7 @@
   (map #(if (= % old) new (cond 
                             (list? %) (deep-replace % old new) 
                             (vector? %) (into [] (deep-replace % old new))
+                            (map? %) (into {} (deep-replace % old new))
                             :else %))
        nested-coll))
 
@@ -220,3 +221,6 @@
 
 (defn strcat [s1 & ss]
   ( str/join (cons s1 ss)))
+
+(defn reject [f coll]
+  (filter (complement f) coll))
