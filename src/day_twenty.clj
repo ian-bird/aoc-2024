@@ -39,10 +39,6 @@
                               (cycle [(inc max-in-result)])))))
              (inc max-in-result)))))
 
-(defn shortcut-squares
-  [[s1 s2]]
-  (between s1 s2))
-
 (with-redefs [d16/step-left d18/step-left
               d16/step-right d18/step-right]
   (let [fp "data/day_twenty/problem"]
@@ -61,15 +57,10 @@
           shortcuts (->> path
                          (e/outer* #(vector %1 %2) path)
                          (mapcat identity)
-                         (map sort)
-                         (filter #(= 2 (apply distance %)))
-                         ; we need the bricks for each and are going to
-                         ; distinct on that
-                         (e/chunk shortcut-squares)
-                         (map (fn [options]
-                                (->> options
-                                     (map (fn [[s1 s2]]
-                                            (- (abs (- (costs s1) (costs s2)))
-                                               2)))
-                                     (apply max)))))]
-      (count (filter (partial <= 100) shortcuts)))))
+                         (filter #(>= 20 (apply distance %)))
+                         (map sort) 
+                         distinct
+                         (map (fn [[s1 s2]]
+                                (- (abs (- (costs s1) (costs s2)))
+                                   (distance s1 s2)))))]
+      (time (count (filter (partial <= 100) shortcuts))))))
