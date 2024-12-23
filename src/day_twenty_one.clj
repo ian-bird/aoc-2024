@@ -114,6 +114,10 @@
          (reduce + 0)
          (* (extract-num string)))))
 
-(reduce + 0 (map complexity ["029A" "980A" "179A" "456A" "379A"]))
+(reduce + 0 (map complexity [
+                             ; problem set
+]))
 
-(reduce + 0 (map complexity ["169A" "279A" "540A" "869A" "789A"]))
+(reduce + 0 (map complexity [
+                             ; test set
+]))
