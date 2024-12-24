@@ -21,32 +21,29 @@
       (assoc a->b b #{a}))))
 
 
-(defn another-hop
-  [conns-ref conns]
-  (->> conns
-       (map (fn [[k v]] [k (into {} (map #(vector % (conns-ref %)) v))]))
-       (into {})))
+(defn extend-set
+  [extending conns]
+  (->> conns 
+       (map (fn [[add-on v]] (if (set/superset? v extending) (conj extending add-on) extending)))
+       distinct))
+
+(extend-set #{4} {4 #{1 2 3 5}, 5 #{1 2 4}})
+
+(defn extend-all-sets
+  [extendings conns]
+  (distinct (mapcat #(extend-set % conns) extendings)))
+
+(defn fully-extend
+  [conns]
+  (loop [to-extend (map (fn [[comp _]] #{comp}) conns)]
+    (let [extended (extend-all-sets to-extend conns)]
+      (if (= extended to-extend)
+        extended
+        (recur extended)))))
+
 
 (let [conns (->> "data/day_twenty_three/problem.edn"
                  slurp
                  read-string
                  (reduce gen-conns {}))]
-  (->> conns
-       (another-hop conns)
-       (map (fn [[k v]] [k (another-hop conns v)]))
-       (mapcat (fn [[k1 v1]]
-                 (->> v1
-                      (map (fn [[k2 v2]] [k2
-                                          (->> v2
-                                               (map (fn [[k3 v3]]
-                                                      [k3 (contains? v3 k1)]))
-                                               (filter (fn [[_ v3]] v3))
-                                               (map (fn [[k3 _]] k3)))]))
-                      (remove (fn [[_ v2]] (empty? v2)))
-                      (mapcat (fn [[k2 v2]] (map #(vector k2 %) v2)))
-                      (map #(concat [k1] %)))))
-       (map sort)
-       distinct
-       (map #(map pr-str %))
-       (filter (fn [triangle] (some #(str/starts-with? % "t") triangle)))
-       count))
+  (str/join "," (sort (into [] (apply max-key count (fully-extend conns))))))
