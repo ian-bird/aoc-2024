@@ -124,7 +124,3 @@
     (if (= coll rep)
       coll
       (repeatedly-replace smap (sort-args rep)))))
-
-(repeatedly-replace reps (sort-args z44))
-
-(filter (fn [[_ v]](= 'c40 v))reps)
