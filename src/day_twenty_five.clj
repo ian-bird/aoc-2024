@@ -3,7 +3,6 @@
     [file-help :as fh]
     [extension :as e]))
 
-
 (let [file "data/day_twenty_five/problem"]
   (fh/extract-chars file)
   (->> (str file ".edn")

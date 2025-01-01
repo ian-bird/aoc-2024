@@ -4,12 +4,15 @@
    [extension]))
 
 
-; convert to edn
+; convert to edn,
+; just extracting out the numbers
+; and putting them into a 2d array
 (->> "data/day_one/problem.txt"
      slurp
      str/split-lines
      (map #(str/split % #" "))
-     (map #(map read-string %))
+     (map #(remove (partial = "") %))
+     (mapv #(mapv read-string %))
      pr-str
      (spit "data/day_one/problem.edn"))
 
@@ -19,20 +22,19 @@
      read-string
      (apply mapv vector)
      (map sort)
-     (apply map list)
-     (map #(abs (- (first %) (second %))))
-     (reduce + 0))
+     (apply mapv vector)
+     (map #(abs (- (% 0) (% 1))))
+     (reduce +))
 
 ; solution for p2
 (let [input (->> "data/day_one/problem.edn"
                 slurp
                 read-string)
-      ; update the map to have all the numbers in it
+      ; create a map of numbers to how many times they appear
       right-counts (->> input
-                        (extension/chunk #(second %))
-                        (map #(vector (second (first %)) (count %)))
-                        (into {}))]
+                        (reduce (fn [map [l r]] (update map r #(cons l %))) {})
+                        (#(update-vals % count)))]
   (->> input
-       (filter #(contains? right-counts (first %)))
-       (map #(* (first %) (get right-counts (first %))))
-       (reduce + 0)))
+       (filter #(contains? right-counts (% 0)))
+       (map #(* (% 0) (right-counts (% 0))))
+       (reduce +)))
